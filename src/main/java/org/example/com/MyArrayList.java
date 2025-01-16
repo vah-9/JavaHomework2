@@ -40,7 +40,7 @@ public class MyArrayList<E> {
      * @throws IndexOutOfBoundsException В случае выхода за границы индекса
      */
     public E get(int index){
-        if (index < 0 || index > arrayListLength){ // проверка на границы индекса
+        if (index < 0 || index >= arrayListLength){ // проверка на границы индекса
             throw new IndexOutOfBoundsException();
         }
         return arrayList(index);
@@ -59,7 +59,7 @@ public class MyArrayList<E> {
      */
     public void add(int index, E element){
 
-        if (index > arrayListLength || index < 0){ // следим за границами при добавлении по индексу
+        if (index >= arrayListLength || index < 0){ // следим за границами при добавлении по индексу
             throw new IndexOutOfBoundsException();
         }
 
@@ -107,7 +107,7 @@ public class MyArrayList<E> {
      */
     public void remove(int index){
 
-        if (index < 0 || index > arrayListLength){ // следим за границами при удалении по индексу
+        if (index < 0 || index >= arrayListLength){ // следим за границами при удалении по индексу
             throw new IndexOutOfBoundsException();
         }
 
