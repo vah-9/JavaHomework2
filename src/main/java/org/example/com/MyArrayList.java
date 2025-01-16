@@ -1,20 +1,27 @@
 package org.example.com;
 
 import java.util.Comparator;
-import java.util.Iterator;
 
 public class MyArrayList<E> {
 
     private int arrayListLength; // длина списка
     private Object[] arrayList; // список
-    private Object[] emptyArrayList = {}; // пустой список
+    private final Object[] emptyArrayList = {}; // пустой список
 
+
+    /**
+     * создает новый пустой список
+     */
     public MyArrayList(){
         // конструктор создает пустой список
         arrayList = emptyArrayList;
         arrayListLength = 0;
     }
 
+    /**
+     * Добавляет элемент в конец списка
+     * @param element Элемент, который будет добавлен
+     */
     public void add(E element){
         int newArrayListLength = arrayListLength + 1; // длина будущего массива
         Object[] newArrayList = new Object[newArrayListLength]; // создаем новый массив с новой длиной
@@ -26,17 +33,34 @@ public class MyArrayList<E> {
         arrayListLength = newArrayListLength; // обновляем длину
     }
 
+    /**
+     * Возвращает значение по указанному индексу
+     * @param index Индекс элемента
+     * @return Значение по индексу
+     * @throws IndexOutOfBoundsException В случае выхода за границы индекса
+     */
     public E get(int index){
         if (index < 0 || index > arrayListLength){ // проверка на границы индекса
             throw new IndexOutOfBoundsException();
         }
-        return (E) arrayList[index]; // приводим к Е и возвращаем, в настоящем arrayList тоже ругается на каст
+        return arrayList(index);
     }
 
+    @SuppressWarnings("unchecked")
+    private E arrayList(int index) {
+        return (E) arrayList[index];
+    }
+
+    /**
+     * Добавляет элемент по указанному индексу
+     * @param index Индекс добавления
+     * @param element Элемент
+     * @throws IndexOutOfBoundsException В случае выхода за границы индекса
+     */
     public void add(int index, E element){
 
         if (index > arrayListLength || index < 0){ // следим за границами при добавлении по индексу
-            throw new ArrayIndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException();
         }
 
         int newArrayListLength = arrayListLength + 1; // длина будущего массива
@@ -55,23 +79,32 @@ public class MyArrayList<E> {
         arrayListLength = newArrayListLength; // и длину
     }
 
-    public void add(MyArrayList<E> arrayListforCopy){
+    /**
+     * Добавляет переданный список в конец этого списка
+     * @param arrayListForCopy Список, который будет добавлен в конец этого списка
+     */
+    public void add(MyArrayList<E> arrayListForCopy){
 
-        int newArrayListLength = arrayListLength + arrayListforCopy.arrayListLength; // длина будущего массива
+        int newArrayListLength = arrayListLength + arrayListForCopy.arrayListLength; // длина будущего массива
         Object[] newArrayList = new Object[newArrayListLength]; // новый массив
 
         // заполняем первую половину нового массива текущим массивом
         if (arrayListLength >= 0) System.arraycopy(arrayList, 0, newArrayList, 0, arrayListLength);
 
         // заполняем вторую половину нового массива полученным в аргументе массивом
-        if (arrayListforCopy.arrayListLength >= 0)
-            System.arraycopy(arrayListforCopy.arrayList, 0, newArrayList, arrayListLength + 0, arrayListforCopy.arrayListLength);
+        if (arrayListForCopy.arrayListLength >= 0)
+            System.arraycopy(arrayListForCopy.arrayList, 0, newArrayList, arrayListLength, arrayListForCopy.arrayListLength);
 
         arrayList = newArrayList; // обновляем наш массив
         arrayListLength = newArrayListLength; // и длину
 
     }
 
+    /**
+     * Удаляет элемент по указанному индексу
+     * @param index Индекс, по которому удалится элемент
+     * @throws IndexOutOfBoundsException В случае выхода за границы индекса
+     */
     public void remove(int index){
 
         if (index < 0 || index > arrayListLength){ // следим за границами при удалении по индексу
@@ -93,11 +126,17 @@ public class MyArrayList<E> {
         arrayListLength = newArrayListLength; // и длину
     }
 
+    /**
+     * Очищает список
+     */
     public void clear(){
         arrayList = emptyArrayList;
         arrayListLength = 0;
     }
 
+    /**
+     * Выводит все элементы списка
+     */
     public void printAll(){
         // выводит весь массив
         if (arrayListLength == 0){
@@ -110,20 +149,24 @@ public class MyArrayList<E> {
         System.out.println();
     }
 
+    /**
+     * Сортирует список алгоритмом быстрой сортировки
+     * @param comparator контракт сравнения элементов типа Е
+     */
     public void sort(Comparator<E> comparator){
         arrayList = quickSort(this, comparator).arrayList;
     }
 
     private MyArrayList<E> quickSort(MyArrayList<E> arr,Comparator<E> comparator){
-        // реализовано как в книжке Грокаем алгоритмы
+        // реализовано как в книге Грокаем алгоритмы
         if (arr.arrayListLength < 2){
             return arr; // базовый случай - короткий список, который не надо сортировать
         }
         E pivot = arr.get(0); // опорный элемент сравнения
-        MyArrayList<E> less = new MyArrayList<E>();
-        MyArrayList<E> more = new MyArrayList<E>();
+        MyArrayList<E> less = new MyArrayList<>();
+        MyArrayList<E> more = new MyArrayList<>();
 
-        for (int i = 1; i < arr.arrayListLength; i++) { // сравниваем каждый элемент списка с ним, меньшие доавбляем в список less, большие в more
+        for (int i = 1; i < arr.arrayListLength; i++) { // сравниваем каждый элемент списка с опорным, меньшие доавбляем в список less, большие в more
             if (comparator.compare(arr.get(i),pivot) < 0){
                 less.add(arr.get(i));
             }else{
@@ -131,12 +174,11 @@ public class MyArrayList<E> {
             }
         }
 
-        // результат собираем из отсортированного списка меньших элементов, базы и списка больших
-        MyArrayList<E> res = new MyArrayList<E>();
+        // результат собираем из отсортированного списка меньших элементов, базы и отсортированного списка больших
+        MyArrayList<E> res = new MyArrayList<>();
         res.add(quickSort(less,comparator));
         res.add(pivot);
         res.add(quickSort(more,comparator));
         return res;
     }
-
 }
